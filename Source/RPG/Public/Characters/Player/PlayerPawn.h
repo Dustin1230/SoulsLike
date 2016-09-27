@@ -146,6 +146,9 @@ private:
 	void DodgeRoll(FVector Direction);
 
 	void CheckLevelUp();
+
+	void ScanRight();
+	void ScanLeft();
 	
 	void LookAtTarget();
 

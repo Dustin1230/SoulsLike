@@ -50,10 +50,17 @@ void APlayerPawn::SetupPlayerInputComponent(class UInputComponent* InputComponen
 	InputComponent->BindAxis("MoveRight", this, &APlayerPawn::MoveRight);
 	InputComponent->BindAxis("LookUpRate", this, &APlayerPawn::LookUpRate);
 	InputComponent->BindAxis("LookRightRate", this, &APlayerPawn::LookRightRate);
+	
+	/*M + K has a slightly different control scheme for handling lock on, 
+	* Since it really isn;t comfortable by using straight controller controls.
+	*/
 	InputComponent->BindAxis("LookUp", this, &APawn::AddControllerPitchInput);
 	InputComponent->BindAxis("LookRight", this, &APawn::AddControllerYawInput);
 
 	InputComponent->BindAction("DodgeRoll", IE_Pressed, this, &APlayerPawn::DodgePress);
+
+	InputComponent->BindAction("ScanRight", IE_Pressed, this, &APlayerPawn::ScanRight);
+	InputComponent->BindAction("ScanLeft", IE_Pressed, this, &APlayerPawn::ScanLeft);
 	
 	InputComponent->BindAction("Sprint", IE_Pressed, this, &APlayerPawn::SprintPress);
 	InputComponent->BindAction("Sprint", IE_Released, this, &APlayerPawn::StopSprint);
@@ -333,6 +340,18 @@ void APlayerPawn::ProcessSphereScanHit(TArray<FHitResult> OutHits)
 	}
 
 	LockOn(CurrentClosest);
+}
+
+void APlayerPawn::ScanRight()
+{
+	if(bIsLockedOn)
+		SideScanForTarget(1);
+}
+
+void APlayerPawn::ScanLeft()
+{
+	if (bIsLockedOn)
+		SideScanForTarget(-1);
 }
 
 void APlayerPawn::SideScanForTarget(float Direction)
