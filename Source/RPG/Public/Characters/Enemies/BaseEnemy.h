@@ -20,6 +20,11 @@ public:
 	UPROPERTY(EditDefaultsOnly, Category = "Enemy Info")
 		int32 XPWorth;
 
+	/*The possible "basic" attacks all enemies will have, and will be accessed through the enemies
+	behavior tree, specialzed attacks should be for bosses only.
+	*/
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Enemy Info")
+		TArray<UAnimMontage*> PossibleAttacks;
 
 	UFUNCTION(BlueprintCallable, Category = "Character Update")
 		virtual void UpdateStats() override;
