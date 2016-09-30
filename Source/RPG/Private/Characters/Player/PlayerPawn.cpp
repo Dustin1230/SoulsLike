@@ -54,8 +54,8 @@ void APlayerPawn::SetupPlayerInputComponent(class UInputComponent* InputComponen
 	/*M + K has a slightly different control scheme for handling lock on, 
 	* Since it really isn;t comfortable by using straight controller controls.
 	*/
-	InputComponent->BindAxis("LookUp", this, &APawn::AddControllerPitchInput);
-	InputComponent->BindAxis("LookRight", this, &APawn::AddControllerYawInput);
+	InputComponent->BindAxis("LookUp", this, &APlayerPawn::LookUp);
+	InputComponent->BindAxis("LookRight", this, &APlayerPawn::LookRight);
 
 	InputComponent->BindAction("DodgeRoll", IE_Pressed, this, &APlayerPawn::DodgePress);
 
@@ -177,10 +177,21 @@ void APlayerPawn::MoveRight(float Value)
 	}
 }
 
+void APlayerPawn::LookUp(float Value)
+{
+	AddControllerPitchInput(Value);
+}
+
 void APlayerPawn::LookUpRate(float Value)
 {
 	//Camera Pitch is enabled when locking on for testing purposes Currently.
 	AddControllerPitchInput(Value * BaseLookUpRate * GetWorld()->GetDeltaSeconds());
+}
+
+void APlayerPawn::LookRight(float Value)
+{
+	if (!bIsLockedOn)
+		AddControllerYawInput(Value * BaseLookRightRate * GetWorld()->GetDeltaSeconds());
 }
 
 void APlayerPawn::LookRightRate(float Value)
@@ -410,6 +421,9 @@ bool APlayerPawn::ProcessSideScanHit(TArray<FHitResult> OutHits)
 
 void APlayerPawn::LockOn(ABasePawn* Target)
 {
+	if (bIsSprinting)
+		StopSprint();
+
 	bIsLockedOn = true;
 	GetCharacterMovement()->bOrientRotationToMovement = false;
 	SetCurrentTarget(Target);

@@ -131,6 +131,9 @@ private:
 
 	void MoveForward(float Value);
 	void MoveRight(float Value);
+
+	void LookUp(float Value);
+	void LookRight(float Value);
 	void LookUpRate(float Value);
 	void LookRightRate(float Value);
 
