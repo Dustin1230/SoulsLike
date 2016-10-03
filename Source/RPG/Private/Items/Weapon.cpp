@@ -9,7 +9,8 @@ AWeapon::AWeapon()
 	WeaponSkelMesh = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("WeaponSkelMesh"));
 	Hitbox = CreateDefaultSubobject<UBoxComponent>(TEXT("Hitbox"));
 
-	Hitbox->AttachToComponent(WeaponSkelMesh, FAttachmentTransformRules::SnapToTargetNotIncludingScale, FName("CapeSocket"));
+	RootComponent = WeaponSkelMesh;
+	Hitbox->SetupAttachment(RootComponent);
 
 }
 

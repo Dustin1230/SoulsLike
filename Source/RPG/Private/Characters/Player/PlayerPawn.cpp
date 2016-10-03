@@ -32,7 +32,7 @@ APlayerPawn::APlayerPawn()
 	PlayerCamera->bUsePawnControlRotation = false; // Camera does not rotate relative to arm
 
 	Cape = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("Cape"));
-	Cape->AttachToComponent(GetMesh(), FAttachmentTransformRules::KeepRelativeTransform, FName("CapeSocket"));
+	Cape->SetupAttachment(GetMesh(), FName("CapeSocket"));
 
 	bIsSprinting = false;
 	bIsLockedOn = false;

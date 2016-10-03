@@ -18,10 +18,6 @@ void AArmor::OnEquip(ABasePawn* OwningPawn)
 	OwningPawn->DeltaIceDefense(ArmorInfo.IceRating);
 	OwningPawn->DeltaDarkDefense(ArmorInfo.DarkRating);
 	OwningPawn->DeltaLightDefense(ArmorInfo.LightRating);
-
-	//Even though the armor is invisible, if I ever come back to this project and I need armor to move, I won't have to
-	//Change Much to implement it.
-	AttachToComponent(OwningPawn->GetMesh(), FAttachmentTransformRules::SnapToTargetIncludingScale, "None");
 }
 
 void AArmor::OnDequip(ABasePawn* OwningPawn)
