@@ -367,13 +367,11 @@ void APlayerPawn::ScanLeft()
 
 void APlayerPawn::SideScanForTarget(float Direction)
 {
-	for (int32 i = 0; i <= 12; i++)
-	{
+	
 		FVector Start = GetActorLocation();
 
-		//Scan Angle increases in increments of 5, up to a maximum of +/-60 degrees.
-		float ScanAngle = GetActorRotation().Yaw + (i * (5 * Direction));
-
+		//Scan +- 45 degrees of the players forward vector
+		float ScanAngle = GetActorRotation().Yaw + (45 * Direction);
 		FRotator ScanRotation = FRotator(GetActorRotation().Pitch, ScanAngle, GetActorRotation().Roll);
 	
 		FVector End = UKismetMathLibrary::GetForwardVector(ScanRotation) * SideScanDistance;
@@ -386,17 +384,10 @@ void APlayerPawn::SideScanForTarget(float Direction)
 		TArray<TEnumAsByte<EObjectTypeQuery>> ObjectTypes;
 		ObjectTypes.Add(UEngineTypes::ConvertToObjectType(ECC_Pawn)); 
 
-		bool Result = UKismetSystemLibrary::LineTraceMultiForObjects(GetWorld(), Start, End, ObjectTypes, false, ActorsToIgnore, EDrawDebugTrace::None, OutHits, true);
-		
-		bool bShouldBreak = false;
+		bool Result = UKismetSystemLibrary::SphereTraceMultiForObjects(GetWorld(), Start, End, 250.f, ObjectTypes, false, ActorsToIgnore, EDrawDebugTrace::None, OutHits, true);
 
 		if (Result)
-		{
-			//If we have a new target...
-			if(ProcessSideScanHit(OutHits))
-				break;
-		}
-	}
+			ProcessSideScanHit(OutHits);
 }
 
 bool APlayerPawn::ProcessSideScanHit(TArray<FHitResult> OutHits) 

@@ -10,6 +10,8 @@ AWeapon::AWeapon()
 	Hitbox = CreateDefaultSubobject<UBoxComponent>(TEXT("Hitbox"));
 
 	RootComponent = WeaponSkelMesh;
+
+	//Setup attachment to root component so it will move with the sword mesh.
 	Hitbox->SetupAttachment(RootComponent);
 
 }
