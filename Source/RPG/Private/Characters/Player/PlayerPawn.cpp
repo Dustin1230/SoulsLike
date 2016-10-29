@@ -325,10 +325,10 @@ void APlayerPawn::SearchForTargets()
 	bool Result = UKismetSystemLibrary::SphereTraceMultiForObjects(GetWorld(), Start, End, LockOnSearchRadius, ObjectTypes, true, ActorsToIgnore, EDrawDebugTrace::None, OutHits, true);
 	
 	if (Result)
-		ProcessSphereScanHit(OutHits);
+		ProcessLockOnScanHit(OutHits);
 }
 
-void APlayerPawn::ProcessSphereScanHit(TArray<FHitResult> OutHits)
+void APlayerPawn::ProcessLockOnScanHit(TArray<FHitResult> OutHits)
 {
 	ABasePawn* CurrentClosest = nullptr;
 	TArray<ABasePawn*> CheckedActors;
@@ -337,20 +337,25 @@ void APlayerPawn::ProcessSphereScanHit(TArray<FHitResult> OutHits)
 	{
 		auto TestTarget = Cast<ABasePawn>(OutHits[i].GetActor());
 
-		if (!CheckedActors.Contains(TestTarget))
+		if (TestTarget && !TestTarget->GetIsDead())
 		{
-			CheckedActors.Add(TestTarget);
+	
+			if (!CheckedActors.Contains(TestTarget))
+			{
+				CheckedActors.Add(TestTarget);
 
-			if (i == 0)
-				CurrentClosest = TestTarget;
+				if (i == 0)
+					CurrentClosest = TestTarget;
 
-			if (TestTarget->GetDistanceTo(this) < TestTarget->GetDistanceTo(this) && !TestTarget->GetIsDead())
-				CurrentClosest = TestTarget;
-
+				if (TestTarget->GetDistanceTo(this) < CurrentClosest->GetDistanceTo(this))
+					CurrentClosest = TestTarget;
+			}
 		}
 	}
 
-	LockOn(CurrentClosest);
+	//If we have a Target
+	if(CurrentClosest)
+		LockOn(CurrentClosest);
 }
 
 void APlayerPawn::ScanRight()
@@ -367,47 +372,28 @@ void APlayerPawn::ScanLeft()
 
 void APlayerPawn::SideScanForTarget(float Direction)
 {
-	
-		FVector Start = GetActorLocation();
 
-		//Scan +- 45 degrees of the players forward vector
-		float ScanAngle = GetActorRotation().Yaw + (45 * Direction);
-		FRotator ScanRotation = FRotator(GetActorRotation().Pitch, ScanAngle, GetActorRotation().Roll);
-	
-		FVector End = UKismetMathLibrary::GetForwardVector(ScanRotation) * SideScanDistance;
-	
-		TArray<class AActor*> ActorsToIgnore;
-		ActorsToIgnore.Add(this);
+	FVector Start = GetActorLocation();
 
-		TArray<FHitResult> OutHits;
+	//Scan 30 +- degrees of the players forward vector
+	const float ScanAngle = GetActorRotation().Yaw + (30 * Direction);
+	const FRotator ScanRotation = FRotator(GetActorRotation().Pitch, ScanAngle, GetActorRotation().Roll);
 
-		TArray<TEnumAsByte<EObjectTypeQuery>> ObjectTypes;
-		ObjectTypes.Add(UEngineTypes::ConvertToObjectType(ECC_Pawn)); 
+	FVector End = Start + UKismetMathLibrary::GetForwardVector(ScanRotation) * SideScanDistance;
 
-		bool Result = UKismetSystemLibrary::SphereTraceMultiForObjects(GetWorld(), Start, End, 250.f, ObjectTypes, false, ActorsToIgnore, EDrawDebugTrace::None, OutHits, true);
+	TArray<class AActor*> ActorsToIgnore;
+	ActorsToIgnore.Add(this);
+	ActorsToIgnore.Add(GetCurrentTarget());
 
-		if (Result)
-			ProcessSideScanHit(OutHits);
-}
+	TArray<FHitResult> OutHits;
 
-bool APlayerPawn::ProcessSideScanHit(TArray<FHitResult> OutHits) 
-{
+	TArray<TEnumAsByte<EObjectTypeQuery>> ObjectTypes;
+	ObjectTypes.Add(UEngineTypes::ConvertToObjectType(ECC_Pawn));
 
-	for (int32 i = 0; i < OutHits.Num(); i++)
-	{
-		if (OutHits[i].GetActor() != CurrentTarget)
-		{
-			ABasePawn* NewTarget = Cast<ABasePawn>(OutHits[i].GetActor());
+	bool Result = UKismetSystemLibrary::SphereTraceMultiForObjects(GetWorld(), Start, End, SideScanRadius, ObjectTypes, false, ActorsToIgnore, EDrawDebugTrace::None, OutHits, true);
 
-			if (NewTarget)
-			{
-				SetCurrentTarget(NewTarget);
-				return true;
-			}
-		}
-	}
-
-	return false;
+	if (Result)
+		ProcessLockOnScanHit(OutHits);
 }
 
 void APlayerPawn::LockOn(ABasePawn* Target)
@@ -444,8 +430,15 @@ void APlayerPawn::LookAtTarget()
 	if (CurrentTarget)
 	{
 
+		//If our current target died, lock off then try to find a new one.
+		if (CurrentTarget->GetIsDead())
+		{	
+			LockOff();
+			SearchForTargets();
+		}
+
 		//If our current target is dead or out of range, LockOff
-		if (CurrentTarget->GetIsDead() || CurrentTarget == NULL || CurrentTarget->GetDistanceTo(this) > LockOnSearchRadius)
+		else if (CurrentTarget == NULL || CurrentTarget->GetDistanceTo(this) > LockOnSearchRadius)
 			LockOff();
 
 		//Else, face our target.
@@ -583,6 +576,12 @@ bool APlayerPawn::GetIsSprinting() const
 {
 	return bIsSprinting;
 }
+
+bool APlayerPawn::GetIsLockedOn() const
+{
+	return bIsLockedOn;
+}
+
 
 bool APlayerPawn::CanSprint() const
 {
