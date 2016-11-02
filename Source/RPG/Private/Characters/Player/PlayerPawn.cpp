@@ -337,7 +337,8 @@ void APlayerPawn::ProcessLockOnScanHit(TArray<FHitResult> OutHits)
 	{
 		auto TestTarget = Cast<ABasePawn>(OutHits[i].GetActor());
 
-		if (TestTarget && !TestTarget->GetIsDead())
+		//If the cast was valid, and the target isn't dead, and if we have a line of sight.
+		if (TestTarget && !TestTarget->GetIsDead() && HasLineOfSight(TestTarget))
 		{
 	
 			if (!CheckedActors.Contains(TestTarget))
@@ -356,6 +357,26 @@ void APlayerPawn::ProcessLockOnScanHit(TArray<FHitResult> OutHits)
 	//If we have a Target
 	if(CurrentClosest)
 		LockOn(CurrentClosest);
+}
+
+bool APlayerPawn::HasLineOfSight(ABasePawn* TestPawn) const
+{
+	FVector Start = GetMesh()->GetSocketLocation(FName("Head"));
+	FVector End = TestPawn->GetActorLocation();
+
+	TArray<class AActor*> ActorsToIgnore;
+
+	FHitResult OutHits;
+
+	TArray<TEnumAsByte<EObjectTypeQuery>> ObjectTypes;
+	ObjectTypes.Add(UEngineTypes::ConvertToObjectType(ECC_WorldStatic));
+
+	bool Result = UKismetSystemLibrary::LineTraceSingleForObjects(GetWorld(), Start, End, ObjectTypes, true, ActorsToIgnore, EDrawDebugTrace::None, OutHits, true);
+
+	//We want to return the opposite of the result, so that way in the function call, 
+	//people wont see !HasLineOfSight(), which would imply we don't have a line of sight,
+	return !Result;
+		
 }
 
 void APlayerPawn::ScanRight()

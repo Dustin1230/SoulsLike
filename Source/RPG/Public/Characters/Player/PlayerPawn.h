@@ -166,7 +166,13 @@ private:
 	void AddLockOnPitch(float Angle);
 	void SideScanForTarget(float Direction);
 	void ProcessLockOnScanHit(TArray<FHitResult> OutHits);
-	void ProcessLockOnSideScanHit(TArray<FHitResult> OutHits);
+
+	/*
+	*	HasLineOfSight(): A function that tests to make sure the player could "See" the pawn if they were to lokc onto them
+	*	It does a linetrace starting at the players head, and ends at the test pawn looking for world objects, if it hits a
+	*	world object, we can't "see" them. Used to prevent from the player locking on a target behind walls.
+	*/
+	bool HasLineOfSight(ABasePawn* TestPawn) const;
 	float GetCameraAngleDelta() const;
 
 	void AttackPress();
