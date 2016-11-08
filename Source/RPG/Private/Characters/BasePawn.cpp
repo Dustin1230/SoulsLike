@@ -23,7 +23,6 @@ ABasePawn::ABasePawn()
 
 void ABasePawn::BeginPlay()
 {
-
 	Super::BeginPlay();
 
 	SpawnEquipment();
@@ -81,8 +80,10 @@ void ABasePawn::AffectHealth(int32 Delta, TSubclassOf<UDamgeTypeBase> IncDamageT
 
 	UDamgeTypeBase* TypeOfDamage = Cast<UDamgeTypeBase>(IncDamageType->GetDefaultObject());
 
+	//If the cast was successful
 	if (TypeOfDamage)
 	{
+		//If the damage type was a heal
 		if (TypeOfDamage->DamageType == EDamageType::DT_Heal)
 		{
 			Health += Delta;
@@ -110,6 +111,8 @@ void ABasePawn::AffectHealth(int32 Delta, TSubclassOf<UDamgeTypeBase> IncDamageT
 
 int32 ABasePawn::GetDefenseStat(UDamgeTypeBase* TypeOfDamage) const
 {
+
+	//Handle what defense bonus's should be returned.
 	switch (TypeOfDamage->DamageType)
 	{
 		default:
@@ -177,6 +180,7 @@ void ABasePawn::CheckDead()
 
 void ABasePawn::BeginCleanUp()
 {
+	//Destroy all the pawns equipment
 	if (Equipment.CurrentWeapon)
 	{
 		Equipment.CurrentWeapon->Destroy();

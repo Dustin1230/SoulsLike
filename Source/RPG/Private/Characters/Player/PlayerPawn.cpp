@@ -51,7 +51,8 @@ void APlayerPawn::SetupPlayerInputComponent(class UInputComponent* InputComponen
 	InputComponent->BindAxis("LookUpRate", this, &APlayerPawn::LookUpRate);
 	InputComponent->BindAxis("LookRightRate", this, &APlayerPawn::LookRightRate);
 	
-	/*M + K has a slightly different control scheme for handling lock on, 
+	/*
+	* M + K has a slightly different control scheme for handling lock on, 
 	* Since it really isn;t comfortable by using straight controller controls.
 	*/
 	InputComponent->BindAxis("LookUp", this, &APlayerPawn::LookUp);
@@ -324,6 +325,7 @@ void APlayerPawn::SearchForTargets()
 
 	bool Result = UKismetSystemLibrary::SphereTraceMultiForObjects(GetWorld(), Start, End, LockOnSearchRadius, ObjectTypes, true, ActorsToIgnore, EDrawDebugTrace::None, OutHits, true);
 	
+	//If we found targets, process it
 	if (Result)
 		ProcessLockOnScanHit(OutHits);
 }

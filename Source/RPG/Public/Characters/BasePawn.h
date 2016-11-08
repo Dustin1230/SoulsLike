@@ -28,24 +28,31 @@ struct FDefenseData
 {
 	GENERATED_BODY()
 
+	/*The Armor rating of the pawn: blocks all incoming physical damage*/
 	UPROPERTY(BlueprintReadOnly)
 		int32 ArmorRating;
 
+	/*The Fire defense of the pawn: blocks all incoming Fire damage*/
 	UPROPERTY(BlueprintReadOnly)
 		int32 FireDefense;
 
+	/*The Ice defense of the pawn: blocks all incoming Ice damage*/
 	UPROPERTY(BlueprintReadOnly)
 		int32 IceDefense;
 
+	/*The Elec defense of the pawn: blocks all incoming Elec damage*/
 	UPROPERTY(BlueprintReadOnly)
 		int32 ElecDefense;
 
+	/*The Light defense of the pawn: blocks all incoming Light damage*/
 	UPROPERTY(BlueprintReadOnly)
 		int32 LightDefense;
 
+	/*The Dark defense of the pawn: blocks all incoming Dark damage*/
 	UPROPERTY(BlueprintReadOnly)
 		int32 DarkDefense;
 
+	/*The Arcane defense of the pawn: blocks all incoming Arcane damage*/
 	UPROPERTY(BlueprintReadOnly)
 		int32 ArcaneDefense;
 };
@@ -317,9 +324,11 @@ public:
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Pawn Getters")
 		FInventoryItemStruct GetInventoryItem(int32 Index) const;
 
+	/*Returns the pawns inventory*/
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Pawn Getters")
 		FInventoryStruct GetInventory() const;
 
+	/*Returns the pawns stats.*/
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Pawn Getters")
 		FStatsStruct GetStats() const;
 
@@ -440,6 +449,7 @@ public:
 
 protected:
 
+	/*The pawns defesne data, such as armor, and elemental resistences*/
 	UPROPERTY(BlueprintReadOnly, Category = "Defense Data")
 		FDefenseData DefenseData;
 
@@ -498,6 +508,7 @@ protected:
 	UPROPERTY(EditDefaultsOnly, Category = "Level Info")
 		FLevelInfo LevelInfo;
 
+	/*Startup Equipment*/
 	UPROPERTY(EditDefaultsOnly, Category = "Start Up")
 		TSubclassOf<AWeapon> StartUpWeapon;
 
@@ -530,6 +541,7 @@ protected:
 	virtual void UpdateStats();
 
 
+	/*On begin play, all the pawns equipment will be spawned.*/
 	void SpawnEquipment();
 
 };
