@@ -226,27 +226,40 @@ public:
 	// Sets default values for this character's properties
 	ABasePawn();
 
+
 	virtual void BeginPlay() override;
 
    /*
 	* When there is a change in a Pawns Health. Declared virtual for extended functionality. 
 	* Children of this class will call the this function, and then do other checks as needed.
+	* @param Delta: The ammount of incoming "Damage"
+	* @param IncDamageType: The type of damage coming in. Note: healing counts as possitive "Damage"
 	*/
 	virtual void AffectHealth(int32 Delta, TSubclassOf<class UDamgeTypeBase> IncDamageType);
-	int32 GetDefenseStat(UDamgeTypeBase* TypeOfDamage) const; //Don't have to say class UDam.. due to forward Declarations!
+
+	/*
+	* Gets the defense stat so that way incoming damage can be reduced base on the damage type
+	* @param TypeOfDamage: The incoming damage type.
+	*/
+	int32 GetDefenseStat(UDamgeTypeBase* TypeOfDamage) const; 
+	
+	/*Check Dead: Checks to see if the pawn is at 0 health*/
 	void CheckDead();
+	
+	/*BeginCleanUp(): Start to delete actors that are no longer needed, like armor and weapons*/
 	void BeginCleanUp();
 
 	/*
 	* When there is a change in the Pawns Stamina.
+	* @param Delta: The amount changed in the Stamina
 	*/
 	void AffectStamina(float Delta);
 
    /*
 	* When there is a change in the Pawns Mana.
+	* @param Delta: The amount changed in the Mana
 	*/
 	void AffectMana(int32 Delta);
-
 
 	/*
 	* Gets the Max Health of the Pawn.
@@ -320,6 +333,8 @@ public:
 	* Note: Before calling this function, use TArray's "IsValidIndex(Index)" function
 	*       to check to see if the array item exists, because this function doesn't
 	*       check it for you. 
+	*
+ 	* @param Index: The index you are trying to access
 	*/
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Pawn Getters")
 		FInventoryItemStruct GetInventoryItem(int32 Index) const;
@@ -352,98 +367,140 @@ public:
 
 	/*
 	* Sets the Max health of the Pawn.
+	* @param NewStat: The new stat for this specfic stat.
 	*/
 	UFUNCTION(BlueprintCallable, Category = "Pawn Setters")
 		void SetMaxHealth(int32 NewStat);
 
 	/*
 	* Sets the Max health of the Pawn.
+	* @param NewStat: The new stat for this specfic stat.
 	*/
 	UFUNCTION(BlueprintCallable, Category = "Pawn Setters")
 		void SetMaxStamina(float NewStat);
 
 	/*
 	* Set the Max mana of the Pawn.
+	* @param NewStat: The new stat for this specfic stat.
 	*/
 	UFUNCTION(BlueprintCallable, Category = "Pawn Setters")
 		void SetMaxMana(int32 NewStat);
 
 	/*
 	* Set the Strength of the Pawn.
+	* @param NewStat: The new stat for this specfic stat.
 	*/
 	UFUNCTION(BlueprintCallable, Category = "Pawn Setters")
 		void SetStrength(int32 NewStat);
 
 	/*
 	* Set the Dexterity of the Pawn.
+	* @param NewStat: The new stat for this specfic stat.
 	*/
 	UFUNCTION(BlueprintCallable, Category = "Pawn Setters")
 		void SetDexterity(int32 NewStat);
 
 	/*
 	* Set the Agility of the Pawn.
+	* @param NewStat: The new stat for this specfic stat.
 	*/
 	UFUNCTION(BlueprintCallable, Category = "Pawn Setters")
 		void SetAgility(int32 NewStat);
 
 	/*
 	* Set the Magic of the Pawn.
+	* @param NewStat: The new stat for this specfic stat.
 	*/
 	UFUNCTION(BlueprintCallable, Category = "Pawn Setters")
 		void SetMagic(int32 NewStat);
 
 	/*
 	* Set the Luck of the Pawn.
+	* @param NewStat: The new stat for this specfic stat.
 	*/
 	UFUNCTION(BlueprintCallable, Category = "Pawn Setters")
 		void SetLuck(int32 NewStat);
 
 	/*
 	* Set the bIsDead variable
+	* @param isDead: Is the pawn dead?
 	*/
 	UFUNCTION(BlueprintCallable, Category = "Pawn Setters")
 		void SetIsDead(bool IsDead);
 
 	/*
 	* Set the Current Target of the Pawn.
+	* @param NewTarget: The new target the pawn will look at.
 	*/
 	UFUNCTION(BlueprintCallable, Category = "Pawn Setters")
 		void SetCurrentTarget(ABasePawn* NewTarget);
 
 	/*
 	* Set the Current Weapon of the Pawn.
+	* @param NewWeapon: The new weapon the pawn will equip.
 	*/
 	UFUNCTION(BlueprintCallable, Category = "Pawn Setters")
 		void SetCurrentWeapon(AWeapon* NewWeapon);
 
-	//Spawning will be done in blueprint instead of C++, hence why we use a pointer instead of TSubclassOf
+	/*
+	* Equip a new piece of armor.
+	* @param NewArmor: The new piece of armor that is to be equiped.
+	*/
 	UFUNCTION(BlueprintCallable, Category = "Pawn Setters")
 		void EquipArmor(AArmor* NewArmor);
+	
 		void ChangeHelmet(AArmor* NewArmor);
 		void ChangeChest(AArmor* NewArmor);
 		void ChangeArms(AArmor* NewArmor);
 		void ChangeLegs(AArmor* NewArmor);
 		void ChangeBoots(AArmor* NewArmor);
 
-	//Deltas since spells can change defense.
+	/*
+	* A change in the armor of the pawn
+	* @param Delta: How much armor is being removed or added?
+	*/
 	UFUNCTION(BlueprintCallable, Category = "Pawn Setters")
 		void DeltaArmor(int32 Delta);
 
+	/*
+	* A change in the fire defense of the pawn
+	* @param Delta: How much fire defense is being removed or added?
+	*/
 	UFUNCTION(BlueprintCallable, Category = "Pawn Setters")
 		void DeltaFireDefense(int32 Delta);
 
+	/*
+	* A change in the Ice defense of the pawn
+	* @param Delta: How much ice defense is being removed or added?
+	*/
 	UFUNCTION(BlueprintCallable, Category = "Pawn Setters")
 		void DeltaIceDefense(int32 Delta);
 
+	/*
+	* A change in the electric defense of the pawn
+	* @param Delta: How much electric defense is being removed or added?
+	*/
 	UFUNCTION(BlueprintCallable, Category = "Pawn Setters")
 		void DeltaElecDefense(int32 Delta);
 
+	/*
+	* A change in the Arcane defense of the pawn
+	* @param Delta: How much Arcane defense is being removed or added?
+	*/
 	UFUNCTION(BlueprintCallable, Category = "Pawn Setters")
 		void DeltaArcaneDefense(int32 Delta);
 
+	/*
+	* A change in the light defense of the pawn
+	* @param Delta: How much light defense defense is being removed or added?
+	*/
 	UFUNCTION(BlueprintCallable, Category = "Pawn Setters")
 		void DeltaLightDefense(int32 Delta);
 
+	/*
+	* A change in the dark defense of the pawn
+	* @param Delta: How much dark defense is being removed or added?
+	*/
 	UFUNCTION(BlueprintCallable, Category = "Pawn Setters")
 		void DeltaDarkDefense(int32 Delta);
 

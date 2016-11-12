@@ -454,13 +454,11 @@ FInventoryItemStruct ABasePawn::GetInventoryItem(int32 Index) const
 
 FInventoryStruct ABasePawn::GetInventory() const
 {
-	//Dev note, we run a check BEFORE this function is called to make sure the index is valid.
 	return Inventory;
 }
 
 FStatsStruct ABasePawn::GetStats() const
 {
-	//Dev note, we run a check BEFORE this function is called to make sure the index is valid.
 	return Stats;
 }
 

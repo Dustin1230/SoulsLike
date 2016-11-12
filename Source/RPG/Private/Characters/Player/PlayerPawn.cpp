@@ -230,11 +230,10 @@ void APlayerPawn::DodgePress()
 void APlayerPawn::CalculateDodge()
 {
 
-
 	if (GetWorldTimerManager().IsTimerActive(StaminaCDTimerHandle))
 		GetWorldTimerManager().ClearTimer(StaminaCDTimerHandle);
 
-	FVector DodgeDir;
+	FVector DodgeDir = FVector::ZeroVector;
 
 	const float MoveForwardValue = GetInputAxisValue("MoveForward");
 	const float MoveRightValue = GetInputAxisValue("MoveRight");
@@ -604,7 +603,6 @@ bool APlayerPawn::GetIsLockedOn() const
 {
 	return bIsLockedOn;
 }
-
 
 bool APlayerPawn::CanSprint() const
 {
