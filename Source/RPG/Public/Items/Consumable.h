@@ -14,6 +14,10 @@ public:
 
 	AConsumable();
 
+	/*
+	* What happens when the pawn consumes the consumable?
+	* @param Consumer: The pawn who is "Consuming" the item
+	*/
 	UFUNCTION(BlueprintNativeEvent, Category = "Consumable Functions")
 		void OnConsume(class ABasePawn* Comsumer);
 	

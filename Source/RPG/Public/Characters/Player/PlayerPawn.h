@@ -41,10 +41,20 @@ class RPG_API APlayerPawn : public ABasePawn
 	
 public:
 
+	//Constructor
 	APlayerPawn();
 
+	/*When the pawn can recieve input*/
 	virtual void BeginPlay() override;
 
+	/*
+	* When there is a change in a Pawns Health. Declared virtual for extended functionality.
+	* This is the players version of AffectHealth, use this when calling this function 
+	* if incoming damage is meant for player.
+	*
+	* @param Delta: The ammount of incoming "Damage"
+	* @param IncDamageType: The type of damage coming in. Note: healing counts as possitive "Damage"
+	*/
 	UFUNCTION(BlueprintCallable, Category = "Gameplay")
 		virtual void AffectHealth(int32 Delta, TSubclassOf<class UDamgeTypeBase> DamageType) override;
 
@@ -237,16 +247,19 @@ private:
 	void ProcessLockOnScanHit(TArray<FHitResult> OutHits);
 
 	/*
-	*	HasLineOfSight(): A function that tests to make sure the player could "See" the pawn if they were to lokc onto them
+	*	HasLineOfSight(): A function that tests to make sure the player could "See" the pawn if they were to lock onto them
 	*	It does a linetrace starting at the players head, and ends at the test pawn looking for world objects, if it hits a
 	*	world object, we can't "see" them. Used to prevent from the player locking on a target behind walls.
 	*/
 	bool HasLineOfSight(ABasePawn* TestPawn) const;
 
+	/**/
 	void UpdateCameraLocation();
 
+	/**/
 	float GetCameraAngleDelta() const;
 
+	/*When the attack button is pressed*/
 	void AttackPress();
 
 	/*Is the pawn currently locked on?*/
@@ -289,7 +302,7 @@ private:
 	/*Checks to see if the current weapons state is either startup or recovery*/
 	bool CanDodgeCancel() const;
 
-	/**/
+	/*Checks to see if the currents weapons state is active*/
 	bool CanAttackCancel() const;
 
 	/*

@@ -52,16 +52,15 @@ void APlayerPawn::SetupPlayerInputComponent(class UInputComponent* InputComponen
 	InputComponent->BindAxis("LookRightRate", this, &APlayerPawn::LookRightRate);
 	
 	/*
-	* M + K has a slightly different control scheme for handling lock on, 
-	* Since it really isn;t comfortable by using straight controller controls.
+	* M + K has a slightly different control scheme for handling lock on and looking around, 
+	* Since it really isn't comfortable doing a straight port.
 	*/
 	InputComponent->BindAxis("LookUp", this, &APlayerPawn::LookUp);
 	InputComponent->BindAxis("LookRight", this, &APlayerPawn::LookRight);
-
-	InputComponent->BindAction("DodgeRoll", IE_Pressed, this, &APlayerPawn::DodgePress);
-
 	InputComponent->BindAction("ScanRight", IE_Pressed, this, &APlayerPawn::ScanRight);
 	InputComponent->BindAction("ScanLeft", IE_Pressed, this, &APlayerPawn::ScanLeft);
+
+	InputComponent->BindAction("DodgeRoll", IE_Pressed, this, &APlayerPawn::DodgePress);
 	
 	InputComponent->BindAction("Sprint", IE_Pressed, this, &APlayerPawn::SprintPress);
 	InputComponent->BindAction("Sprint", IE_Released, this, &APlayerPawn::StopSprint);
