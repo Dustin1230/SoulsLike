@@ -100,6 +100,7 @@ protected:
 	UPROPERTY(EditDefaultsOnly, Category = "Controller Settings")
 		float BaseLookRightRate;
 
+	/*In centermeters, what is the radius of the lock on search?*/
 	UPROPERTY(EditDefaultsOnly, Category = "LockOn Settings")
 		float LockOnSearchRadius;
 
@@ -109,9 +110,11 @@ protected:
 	UPROPERTY(EditDefaultsOnly, Category = "LockOn Settings")
 		float SideScanRadius;
 
+	/*In seconds, how many seconds does it take to start restoring stamina if we DIDN'T run out of stamina?*/
 	UPROPERTY(EditDefaultsOnly, Category = "Stamina CoolDown Settings")
 		float NonEmptyStaminaCDSeconds;
 
+	/*In seconds, how many seconds does it take to start restoring stamina if we DID run out of stamina?*/
 	UPROPERTY(EditDefaultsOnly, Category = "Stamina CoolDown Settings")
 		float EmptyStaminaCDSeconds;
 
@@ -247,7 +250,9 @@ private:
 	void ProcessLockOnScanHit(TArray<FHitResult> OutHits);
 
 	/*
-	*	HasLineOfSight(): A function that tests to make sure the player could "See" the pawn if they were to lock onto them
+	*	HasLineOfSight(): First, we check to see if the test target is currently being rendered, if it is, return true.
+	*	
+	*	Else, it tests to make sure the player could "See" the pawn if they were to lock onto them
 	*	It does a linetrace starting at the players head, and ends at the test pawn looking for world objects, if it hits a
 	*	world object, we can't "see" them. Used to prevent from the player locking on a target behind walls.
 	*/

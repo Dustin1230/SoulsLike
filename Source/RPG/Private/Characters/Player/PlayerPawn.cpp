@@ -340,7 +340,6 @@ void APlayerPawn::ProcessLockOnScanHit(TArray<FHitResult> OutHits)
 		//If the cast was valid, and the target isn't dead, and if we have a line of sight.
 		if (TestTarget && !TestTarget->GetIsDead() && HasLineOfSight(TestTarget))
 		{
-	
 			if (!CheckedActors.Contains(TestTarget))
 			{
 				CheckedActors.Add(TestTarget);
@@ -361,21 +360,30 @@ void APlayerPawn::ProcessLockOnScanHit(TArray<FHitResult> OutHits)
 
 bool APlayerPawn::HasLineOfSight(ABasePawn* TestPawn) const
 {
-	FVector Start = GetMesh()->GetSocketLocation(FName("Head"));
-	FVector End = TestPawn->GetActorLocation();
+	//If the pawn is being rendered, we can obviously see them, return true
+	if (TestPawn->WasRecentlyRendered(0.1f))
+		return true;
+	
+	//Do a line trace to see if we could turn our heads and "see" them
+	else
+	{
+		FVector Start = GetMesh()->GetSocketLocation(FName("Head"));
+		FVector End = TestPawn->GetActorLocation();
 
-	TArray<class AActor*> ActorsToIgnore;
+		TArray<class AActor*> ActorsToIgnore;
 
-	FHitResult OutHits;
+		FHitResult OutHits;
 
-	TArray<TEnumAsByte<EObjectTypeQuery>> ObjectTypes;
-	ObjectTypes.Add(UEngineTypes::ConvertToObjectType(ECC_WorldStatic));
+		//We look for world static objects to see if they are behind some sort of wall.
+		TArray<TEnumAsByte<EObjectTypeQuery>> ObjectTypes;
+		ObjectTypes.Add(UEngineTypes::ConvertToObjectType(ECC_WorldStatic));
 
-	bool Result = UKismetSystemLibrary::LineTraceSingleForObjects(GetWorld(), Start, End, ObjectTypes, true, ActorsToIgnore, EDrawDebugTrace::None, OutHits, true);
+		bool Result = UKismetSystemLibrary::LineTraceSingleForObjects(GetWorld(), Start, End, ObjectTypes, true, ActorsToIgnore, EDrawDebugTrace::None, OutHits, true);
 
-	//We want to return the opposite of the result, so that way in the function call, 
-	//people wont see !HasLineOfSight(), which would imply we don't have a line of sight,
-	return !Result;
+		//We want to return the opposite of the result, so that way in the function call, 
+		//people wont see !HasLineOfSight(), which would imply we don't have a line of sight,
+		return !Result;
+	}
 		
 }
 
