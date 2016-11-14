@@ -22,7 +22,7 @@ struct FLevelUpStats
 {
 	GENERATED_BODY()
 
-
+	/* Current Stat points, points that go into a characters stats, like strength, agility, etc.*/
 	UPROPERTY(BlueprintReadWrite)
 		int32 CurrentStatPoints;
 
@@ -85,18 +85,32 @@ protected:
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Gameplay")
 		bool CanLevelUp() const;
 
+	/*Pawn cape, nothing special, just looks cool.*/
 	UPROPERTY(VisibleDefaultsOnly, Category = Cape)
 	class USkeletalMeshComponent* Cape;
 
+	/*
+	 * When moving (regardless if moving forward or right), how far do we go?
+	 * Higher values means further out.
+	 */
 	UPROPERTY(EditDefaultsOnly, Category = "Dodge Settings")
 		float BaseForwardDodgeSpeed;
 
+	/*When backsteping, how far do we go? Higher values means further out.*/
 	UPROPERTY(EditDefaultsOnly, Category = "Dodge Settings")
 		float BaseBackStepSpeed;
 
+	/*
+	 * When using the controller, what is the input rate at which it goes up/down?
+	 * Higher values means faster camera movements.
+	 */
 	UPROPERTY(EditDefaultsOnly, Category = "Controller Settings")
 		float BaseLookUpRate;
 
+	/*
+	* When using the controller, what is the input rate at which it goes left/right?
+	* Higher values means faster camera movements.
+	*/
 	UPROPERTY(EditDefaultsOnly, Category = "Controller Settings")
 		float BaseLookRightRate;
 
@@ -104,9 +118,11 @@ protected:
 	UPROPERTY(EditDefaultsOnly, Category = "LockOn Settings")
 		float LockOnSearchRadius;
 
+	/*When we do a side scan, in centimeters, how far does the trace search go out?*/
 	UPROPERTY(EditDefaultsOnly, Category = "LockOn Settings")
 		float SideScanDistance;
 
+	/*When we do a side scane, in centimeters, what is the radius of the search?*/
 	UPROPERTY(EditDefaultsOnly, Category = "LockOn Settings")
 		float SideScanRadius;
 
@@ -118,18 +134,31 @@ protected:
 	UPROPERTY(EditDefaultsOnly, Category = "Stamina CoolDown Settings")
 		float EmptyStaminaCDSeconds;
 
+	/*When not locked on, where is the camera noramlly at?*/
 	UPROPERTY(EditDefaultsOnly, Category = "Camera Settings")
 		FVector NormalCamPosition;
 
+	/*When locked on, where is the camera position at?*/
 	UPROPERTY(EditDefaultsOnly, Category = "Camera Settings")
 		FVector LockOnCamPosition;
 
+	/*Camera target postion, on lock on/off, camera will move to the new position */
 	UPROPERTY(BlueprintReadOnly, Category = "Camera Settings")
 		FVector CameraTargetPosition;
 
+	/*
+	 * What happens when the camera locks on?
+	 * Declaired as BlueprintNativeEvent since it will fun a timeline that is 
+	 * much eaiser to do in Blueprint.
+	 */
 	UFUNCTION(BlueprintNativeEvent, Category = "Camera Events")
 		void OnCameraLockOn();
 
+	/*
+	* What happens when the camera locks off?
+	* Declaired as BlueprintNativeEvent since it will fun a timeline that is
+	* much eaiser to do in Blueprint.
+	*/
 	UFUNCTION(BlueprintNativeEvent, Category = "Camera Events")
 		void OnCameraLockOff();
 
@@ -137,15 +166,19 @@ protected:
 	UPROPERTY(EditDefaultsOnly, Category = "Sprint Settings")
 		float BaseSprintSpeed;
 
+	/*What data table is used when we want to check for level ups and extract stats from those level ups?*/
 	UPROPERTY(EditDefaultsOnly, Category = "Level Up Info")
 		UDataTable* LevelUpDataTable;
 
+	/*The level up stats, of the pawn, holds data such as CurrentStatPoints and CurrentLevelUpPoints*/
 	UPROPERTY(BlueprintReadOnly, Category = "Level Up Info")
 		FLevelUpStats LevelUpStats;
 
+	/*On level up, what particle system plays?*/
 	UPROPERTY(EditDefaultsOnly, Category = "Level Up Info")
 		UParticleSystem* LevelUpPS;
 
+	/*On level up, what sound is played?*/
 	UPROPERTY(EditDefaultsOnly, Category = "Level Up Info")
 		USoundBase* LevelUpSound;
 
@@ -229,7 +262,11 @@ private:
 	/*Stop looking at the target*/
 	void LockOff();
 
-	void AddLockOnPitch(float Angle);
+	/*
+	 * Rotate the camera left/right when locked on
+	 * @param Angle: The amount the camera moves.
+	 */
+	void AddLockOnYaw(float Angle);
 
 	/*
 	* When looking for a new target, side scan to either the left or right
@@ -258,10 +295,16 @@ private:
 	*/
 	bool HasLineOfSight(ABasePawn* TestPawn) const;
 
-	/**/
+	/* 
+	 * When locked on, this function is called every frame, it constantly 
+	 * checks to see if the camera should be moving to face the lock on target.
+	 */
 	void UpdateCameraLocation();
 
-	/**/
+	/*
+	 * When called, returns the angle between the player and their lock on, used to determine
+	 * whether or not the camera should be adding pitch.
+	 */
 	float GetCameraAngleDelta() const;
 
 	/*When the attack button is pressed*/
@@ -279,8 +322,13 @@ private:
 	*/
 	float GetDodgeStrength(float DodgeSpeed) const;
 
+	/*In Seconds, how much time is left before stamina starts restoring?*/
 	float CurrentStaminaCDSeconds;
+
+	/*Timer handle to handle the ticking down of the CurrentStaminaCDSeconds variable*/
 	FTimerHandle StaminaCDTimerHandle;
+
+	/*Function to handle the ticking down of the CurrentStaminaCDSeconds variable*/
 	void TickDownStaminaCD();
 
 	/*Checks to see if the pawn can restore stamina*/
@@ -320,9 +368,11 @@ private:
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* InputComponent) override;
 
+	/*The player camera*/
 	UPROPERTY(VisibleDefaultsOnly, Category = Camera)
 		class UCameraComponent* PlayerCamera;
 
+	/*The spring arm that the camera will attach to.*/
 	UPROPERTY(VisibleDefaultsOnly, Category = Boom)
 		class USpringArmComponent* CameraBoom;
 

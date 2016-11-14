@@ -157,7 +157,6 @@ void APlayerPawn::MoveForward(float Value)
 		// get forward vector
 		const FVector Direction = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::X);
 		AddMovementInput(Direction, Value);
-
 	}
 }
 
@@ -173,7 +172,6 @@ void APlayerPawn::MoveRight(float Value)
 		const FVector Direction = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::Y);
 		// add movement in that direction
 		AddMovementInput(Direction, Value);
-
 	}
 }
 
@@ -360,7 +358,13 @@ void APlayerPawn::ProcessLockOnScanHit(TArray<FHitResult> OutHits)
 
 bool APlayerPawn::HasLineOfSight(ABasePawn* TestPawn) const
 {
-	//If the pawn is being rendered, we can obviously see them, return true
+	/* 
+	 * If the pawn is being rendered, we can obviously see them, return true
+	 *
+	 * Note: If WasRecentlyRendered() "Sees" the targets component, it will 
+	 *       return true. So keep in mind that if the "mesh" isn't visible,
+	 *       the capsule component almost certainly is.
+	 */
 	if (TestPawn->WasRecentlyRendered(0.1f))
 		return true;
 	
@@ -419,6 +423,7 @@ void APlayerPawn::SideScanForTarget(float Direction)
 	TArray<TEnumAsByte<EObjectTypeQuery>> ObjectTypes;
 	ObjectTypes.Add(UEngineTypes::ConvertToObjectType(ECC_Pawn));
 
+
 	bool Result = UKismetSystemLibrary::SphereTraceMultiForObjects(GetWorld(), Start, End, SideScanRadius, ObjectTypes, false, ActorsToIgnore, EDrawDebugTrace::None, OutHits, true);
 
 	if (Result)
@@ -466,8 +471,8 @@ void APlayerPawn::LookAtTarget()
 			SearchForTargets();
 		}
 
-		//If our current target is dead or out of range, LockOff
-		else if (CurrentTarget == NULL || CurrentTarget->GetDistanceTo(this) > LockOnSearchRadius)
+		//If our current target is invald, out of range, or not being rendered, lock off.
+		else if (CurrentTarget == NULL || CurrentTarget->GetDistanceTo(this) > LockOnSearchRadius || !CurrentTarget->WasRecentlyRendered(0.1f))
 			LockOff();
 
 		//Else, face our target.
@@ -486,10 +491,10 @@ void APlayerPawn::UpdateCameraLocation()
 	const float Angle = GetCameraAngleDelta();
 
 	if (FMath::Abs(Angle) < 179.f)
-		AddLockOnPitch(Angle);
+		AddLockOnYaw(Angle);
 }
 
-void APlayerPawn::AddLockOnPitch(float Angle)
+void APlayerPawn::AddLockOnYaw(float Angle)
 {
 	const FVector PlayerForwardVector = UKismetMathLibrary::GetForwardVector(GetControlRotation()).GetSafeNormal();
 	const FVector PlayerDotProduct = FVector(PlayerForwardVector.X, PlayerForwardVector.Y, 0.f);
