@@ -45,10 +45,6 @@ public:
 
 	virtual void BeginPlay() override;
 
-	/*
-	* When the Players health is effected. Decalred UFUNCTION since interfaces are done in BP. 
-	* Will call the Parent function then will do other things that need to be exclusive to the Player.
-	*/
 	UFUNCTION(BlueprintCallable, Category = "Gameplay")
 		virtual void AffectHealth(int32 Delta, TSubclassOf<class UDamgeTypeBase> DamageType) override;
 
@@ -58,11 +54,14 @@ public:
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Pawn Getters")
 		bool GetIsSprinting() const;
 
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Pawn Getters")
+		bool GetIsLockedOn() const;
+
 	UFUNCTION(BlueprintCallable, Category = "Gameplay")
 		void AffectXP(int32 Delta);
 	
 	virtual void Tick(float DeltaSeconds) override;
-
+	
 protected:
 
 
@@ -89,6 +88,9 @@ protected:
 
 	UPROPERTY(EditDefaultsOnly, Category = "LockOn Settings")
 		float SideScanDistance;
+
+	UPROPERTY(EditDefaultsOnly, Category = "LockOn Settings")
+		float SideScanRadius;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Stamina CoolDown Settings")
 		float NonEmptyStaminaCDSeconds;
@@ -163,8 +165,14 @@ private:
 	void UpdateCameraLocation();
 	void AddLockOnPitch(float Angle);
 	void SideScanForTarget(float Direction);
-	void ProcessSphereScanHit(TArray<FHitResult> OutHits);
-	bool ProcessSideScanHit(TArray<FHitResult> OutHits);
+	void ProcessLockOnScanHit(TArray<FHitResult> OutHits);
+
+	/*
+	*	HasLineOfSight(): A function that tests to make sure the player could "See" the pawn if they were to lokc onto them
+	*	It does a linetrace starting at the players head, and ends at the test pawn looking for world objects, if it hits a
+	*	world object, we can't "see" them. Used to prevent from the player locking on a target behind walls.
+	*/
+	bool HasLineOfSight(ABasePawn* TestPawn) const;
 	float GetCameraAngleDelta() const;
 
 	void AttackPress();

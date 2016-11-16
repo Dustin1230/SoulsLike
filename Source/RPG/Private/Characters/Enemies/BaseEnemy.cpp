@@ -16,7 +16,7 @@ void ABaseEnemy::UpdateStats()
 
 void ABaseEnemy::AffectHealth(int32 Delta, TSubclassOf<class UDamgeTypeBase> DamageType)
 {
-	//IF we received damage but are dead, don't run this function
+	//If we received damage but are dead, don't run this function
 	if (!bIsDead)
 	{
 		Super::AffectHealth(Delta, DamageType);
@@ -29,7 +29,7 @@ void ABaseEnemy::AffectHealth(int32 Delta, TSubclassOf<class UDamgeTypeBase> Dam
 
 			if (PlayerPawn)
 				PlayerPawn->AffectXP(XPWorth);
-
+		
 			SetLifeSpan(3.f);
 		}
 	}
