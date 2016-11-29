@@ -1,0 +1,24 @@
+Mouse + Keyboard:
+
+WASD: Move
+Mouse: Look around
+Left Click: Attack
+Space: Dodge
+Shift (Held): Sprint
+F: Find Target
+Tab: Level Up
+Q: Search Left
+E: Search Right
+
+Controller:
+
+Left Stick: Move
+Right Stick: Look around
+Left Face Button: Attack
+Right Face Button: Dodge
+Left Stick Click (Held): Sprint
+Right stick clicl: Find Target
+Left button special: level up
+(while locked on) Right Stick left: Search left
+(while locked on) Right Stick right: Search right
+

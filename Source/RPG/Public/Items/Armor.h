@@ -64,14 +64,20 @@ public:
 
 	AArmor();
 
-	/* ArmorInfo, what is the Armors Defense rating, slot, etc.*/
+	/* ArmorInfo, used to configure the armor*/
 	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Armor Info")
 		FArmorInfo ArmorInfo;
 
-	/*When the armor is Eqiuped. On Equip will add defense stats to the pawn*/
+	/*
+	 * When the armor is Eqiuped. On Equip will add defense stats to the pawn
+	 * @param OwningPawn: The pawn that is equiping the armor
+	 */
 	void OnEquip(class ABasePawn* OwningPawn);
 
-	/*When the armor is DeEquiped On DeEquip will remove defense stats from the pawn*/
+	/*
+	 * When the armor is DeEquiped On DeEquip will remove defense stats from the pawn
+	 * @param OwningPawn: the pawn that is unEquiping the armor. 
+	 */
 	void OnDequip(ABasePawn* OwningPawn);
 
 };

@@ -1,5 +1,7 @@
 # RPG
 
+Note: This project was made in version 4.12, any prior engine releases may not be able to run this project.
+
 #### What is this? 
 
 This is an RPG game that is inspired by many other RPGS such as Skyrim, Dark Souls, Etc. 

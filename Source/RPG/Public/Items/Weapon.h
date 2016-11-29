@@ -92,23 +92,30 @@ public:
 
 	AWeapon();
 
-	/*Weapon Data*/
+	/*Weapon Data, used to configure weapon*/
 	UPROPERTY(EditDefaultsOnly, Category = "Weapon Config")
 		FWeaponData WeaponData;
 
-	/*When the weapon is equiped
-	* NewOwner: the new owning pawn of the weapon.
+	/*
+	* When the weapon is equiped
+	* @param NewOwner: the new owning pawn of the weapon.
 	*/
 	void OnEquip(class ABasePawn* NewOwner);
 
 	/*When the weapon is DeEquiped.*/
 	void OnDeEquip();
 
-	/*Set the current owning pawn of the weapon.*/
+	/*
+	 * Set the current owning pawn of the weapon.
+	 * @param NewOwner: the new owning pawn of this weapon
+	 */
 	UFUNCTION(BlueprintCallable, Category = "Weaapon Setters")
 		void SetOwningPawn(ABasePawn* NewOwner);
 
-	/*Sets the current status of the weapon.*/
+	/*
+	 * Sets the current status of the weapon.
+	 * @param NewStatus: The new status of the weapon, status such as Idle, Active, etc.
+	 */
 	UFUNCTION(BlueprintCallable, Category = "Weaapon Setters")
 		void SetCurrentStatus(EWeaponStatus NewStatus);
 
@@ -124,7 +131,8 @@ public:
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Weaapon Getters")
 		EWeaponStatus GetCurrentStatus() const;
 
-	/*Player attack data. The size should be two, any more and the player will ignore other attacks beyond index 1
+	/*
+	* Player attack data. The size should be two, any more and the player will ignore other attacks beyond index 1
 	* 0 = 1st attack and 1 = followup, and will keep alternating between two attacks.
 	*/
 	UPROPERTY(EditDefaultsOnly, Category = "Player Attack Data")
@@ -144,8 +152,9 @@ protected:
 	UPROPERTY(EditDefaultsOnly, Category = "Weapon Config")
 		EWeaponStatus CurrentStatus;
 
-	/*What is the damage type? It is passed when the weapon does damage.
-	* Read the UDamgeTypeBase for more info on damage types.
+	/*
+	* What is the damage type? It is passed when the weapon does damage.
+	* Read the UDamgeTypeBase class for more info on damage types.
 	*/
 	UPROPERTY(BlueprintReadOnly, EditAnywhere = "Weapon Config")
 		TSubclassOf<class UDamgeTypeBase> DamageType;

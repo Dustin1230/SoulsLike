@@ -51,16 +51,16 @@ void APlayerPawn::SetupPlayerInputComponent(class UInputComponent* InputComponen
 	InputComponent->BindAxis("LookUpRate", this, &APlayerPawn::LookUpRate);
 	InputComponent->BindAxis("LookRightRate", this, &APlayerPawn::LookRightRate);
 	
-	/*M + K has a slightly different control scheme for handling lock on, 
-	* Since it really isn;t comfortable by using straight controller controls.
+	/*
+	* M + K has a slightly different control scheme for handling lock on and looking around, 
+	* Since it really isn't comfortable doing a straight port.
 	*/
 	InputComponent->BindAxis("LookUp", this, &APlayerPawn::LookUp);
 	InputComponent->BindAxis("LookRight", this, &APlayerPawn::LookRight);
-
-	InputComponent->BindAction("DodgeRoll", IE_Pressed, this, &APlayerPawn::DodgePress);
-
 	InputComponent->BindAction("ScanRight", IE_Pressed, this, &APlayerPawn::ScanRight);
 	InputComponent->BindAction("ScanLeft", IE_Pressed, this, &APlayerPawn::ScanLeft);
+
+	InputComponent->BindAction("DodgeRoll", IE_Pressed, this, &APlayerPawn::DodgePress);
 	
 	InputComponent->BindAction("Sprint", IE_Pressed, this, &APlayerPawn::SprintPress);
 	InputComponent->BindAction("Sprint", IE_Released, this, &APlayerPawn::StopSprint);
@@ -157,7 +157,6 @@ void APlayerPawn::MoveForward(float Value)
 		// get forward vector
 		const FVector Direction = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::X);
 		AddMovementInput(Direction, Value);
-
 	}
 }
 
@@ -173,7 +172,6 @@ void APlayerPawn::MoveRight(float Value)
 		const FVector Direction = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::Y);
 		// add movement in that direction
 		AddMovementInput(Direction, Value);
-
 	}
 }
 
@@ -229,11 +227,10 @@ void APlayerPawn::DodgePress()
 void APlayerPawn::CalculateDodge()
 {
 
-
 	if (GetWorldTimerManager().IsTimerActive(StaminaCDTimerHandle))
 		GetWorldTimerManager().ClearTimer(StaminaCDTimerHandle);
 
-	FVector DodgeDir;
+	FVector DodgeDir = FVector::ZeroVector;
 
 	const float MoveForwardValue = GetInputAxisValue("MoveForward");
 	const float MoveRightValue = GetInputAxisValue("MoveRight");
@@ -324,6 +321,7 @@ void APlayerPawn::SearchForTargets()
 
 	bool Result = UKismetSystemLibrary::SphereTraceMultiForObjects(GetWorld(), Start, End, LockOnSearchRadius, ObjectTypes, true, ActorsToIgnore, EDrawDebugTrace::None, OutHits, true);
 	
+	//If we found targets, process it
 	if (Result)
 		ProcessLockOnScanHit(OutHits);
 }
@@ -340,7 +338,6 @@ void APlayerPawn::ProcessLockOnScanHit(TArray<FHitResult> OutHits)
 		//If the cast was valid, and the target isn't dead, and if we have a line of sight.
 		if (TestTarget && !TestTarget->GetIsDead() && HasLineOfSight(TestTarget))
 		{
-	
 			if (!CheckedActors.Contains(TestTarget))
 			{
 				CheckedActors.Add(TestTarget);
@@ -361,21 +358,36 @@ void APlayerPawn::ProcessLockOnScanHit(TArray<FHitResult> OutHits)
 
 bool APlayerPawn::HasLineOfSight(ABasePawn* TestPawn) const
 {
-	FVector Start = GetMesh()->GetSocketLocation(FName("Head"));
-	FVector End = TestPawn->GetActorLocation();
+	/* 
+	 * If the pawn is being rendered, we can obviously see them, return true
+	 *
+	 * Note: If WasRecentlyRendered() "Sees" the targets component, it will 
+	 *       return true. So keep in mind that if the "mesh" isn't visible,
+	 *       the capsule component almost certainly is.
+	 */
+	if (TestPawn->WasRecentlyRendered(0.1f))
+		return true;
+	
+	//Do a line trace to see if we could turn our heads and "see" them
+	else
+	{
+		FVector Start = GetMesh()->GetSocketLocation(FName("Head"));
+		FVector End = TestPawn->GetActorLocation();
 
-	TArray<class AActor*> ActorsToIgnore;
+		TArray<class AActor*> ActorsToIgnore;
 
-	FHitResult OutHits;
+		FHitResult OutHits;
 
-	TArray<TEnumAsByte<EObjectTypeQuery>> ObjectTypes;
-	ObjectTypes.Add(UEngineTypes::ConvertToObjectType(ECC_WorldStatic));
+		//We look for world static objects to see if they are behind some sort of wall.
+		TArray<TEnumAsByte<EObjectTypeQuery>> ObjectTypes;
+		ObjectTypes.Add(UEngineTypes::ConvertToObjectType(ECC_WorldStatic));
 
-	bool Result = UKismetSystemLibrary::LineTraceSingleForObjects(GetWorld(), Start, End, ObjectTypes, true, ActorsToIgnore, EDrawDebugTrace::None, OutHits, true);
+		bool Result = UKismetSystemLibrary::LineTraceSingleForObjects(GetWorld(), Start, End, ObjectTypes, true, ActorsToIgnore, EDrawDebugTrace::None, OutHits, true);
 
-	//We want to return the opposite of the result, so that way in the function call, 
-	//people wont see !HasLineOfSight(), which would imply we don't have a line of sight,
-	return !Result;
+		//We want to return the opposite of the result, so that way in the function call, 
+		//people wont see !HasLineOfSight(), which would imply we don't have a line of sight,
+		return !Result;
+	}
 		
 }
 
@@ -410,6 +422,7 @@ void APlayerPawn::SideScanForTarget(float Direction)
 
 	TArray<TEnumAsByte<EObjectTypeQuery>> ObjectTypes;
 	ObjectTypes.Add(UEngineTypes::ConvertToObjectType(ECC_Pawn));
+
 
 	bool Result = UKismetSystemLibrary::SphereTraceMultiForObjects(GetWorld(), Start, End, SideScanRadius, ObjectTypes, false, ActorsToIgnore, EDrawDebugTrace::None, OutHits, true);
 
@@ -458,8 +471,8 @@ void APlayerPawn::LookAtTarget()
 			SearchForTargets();
 		}
 
-		//If our current target is dead or out of range, LockOff
-		else if (CurrentTarget == NULL || CurrentTarget->GetDistanceTo(this) > LockOnSearchRadius)
+		//If our current target is invald, out of range, or not being rendered, lock off.
+		else if (CurrentTarget == NULL || CurrentTarget->GetDistanceTo(this) > LockOnSearchRadius || !CurrentTarget->WasRecentlyRendered(0.1f))
 			LockOff();
 
 		//Else, face our target.
@@ -478,10 +491,10 @@ void APlayerPawn::UpdateCameraLocation()
 	const float Angle = GetCameraAngleDelta();
 
 	if (FMath::Abs(Angle) < 179.f)
-		AddLockOnPitch(Angle);
+		AddLockOnYaw(Angle);
 }
 
-void APlayerPawn::AddLockOnPitch(float Angle)
+void APlayerPawn::AddLockOnYaw(float Angle)
 {
 	const FVector PlayerForwardVector = UKismetMathLibrary::GetForwardVector(GetControlRotation()).GetSafeNormal();
 	const FVector PlayerDotProduct = FVector(PlayerForwardVector.X, PlayerForwardVector.Y, 0.f);
@@ -602,7 +615,6 @@ bool APlayerPawn::GetIsLockedOn() const
 {
 	return bIsLockedOn;
 }
-
 
 bool APlayerPawn::CanSprint() const
 {
