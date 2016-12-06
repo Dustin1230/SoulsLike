@@ -81,7 +81,7 @@ void APlayerPawn::Tick(float DeltaSeconds)
 	Super::Tick(DeltaSeconds);
 
 	if (bIsSprinting)
-		AffectStamina(-0.1f);
+		AffectStamina(-0.1f * DeltaSeconds);
 
 	if (bIsSprinting && !CanSprint())
 		StopSprint();
@@ -90,7 +90,7 @@ void APlayerPawn::Tick(float DeltaSeconds)
 		LookAtTarget();
 
 	if (ShouldRestoreStamina())
-		AffectStamina(0.1f);
+		AffectStamina(0.1f * DeltaSeconds);
 
 }
 
